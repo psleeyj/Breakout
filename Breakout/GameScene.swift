@@ -41,7 +41,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func kickBall() {
         ball.physicsBody?.isDynamic = true
-        ball.physicsBody?.applyImpulse(CGVector(dx: 3, dy: 5))
+        ball.physicsBody?.applyImpulse(CGVector(dx: Int.random(in: -5...5), dy: 5))
     }
     
     func updateLabels(){
@@ -101,6 +101,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(paddle)
         
     }
+    
+    func makeBricks(){
+        // first, remove any leftover bricks (from prior game)
+        for brick in bricks {
+            if brick.parent != nil {
+                brick.removeFromParent()
+            }
+        }
+        
+        bricks.removeAll() // clear the array
+        removedBricks = 0  // reset the counter
+        // now, figure the number and spacing of each row of bricks
+        let count = Int(frame.width) / 55  // bricks per row
+        let xOffset = (Int(frame.width) - (count * 55)) / 2 + Int(frame.minX) + 25
+        let colors: [UIColor] = [.blue, .orange, .green]
+        for r in 0..<3 {
+            let y = Int(frame.maxY) - 65 - (r * 25)
+            for i in 0..<count {
+                let x = i * 55 + xOffset
+                makeBrick(x: x, y: y, color: colors[r])
+            }
+        }
+    }
+    
     func makeBrick(x: Int, y:Int, color: UIColor) {
         let brick = SKSpriteNode(color: .blue, size: CGSize(width: 50, height: 20))
         brick.position = CGPoint(x: x, y: y)
@@ -201,6 +225,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
             }
         }
+        // increase ball velocity by 2%
+        ball.physicsBody!.velocity.dx *= CGFloat(1.02)
+        ball.physicsBody!.velocity.dy *= CGFloat(1.02)
+        
     }
     
     func gameOver(winner: Bool){
@@ -212,26 +240,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         else {
             playLabel.text = "You lose! Tap to play again"
-        }
-    }
-    
-    func makeBricks(){
-        // first, remove any leftover bricks (from prior game)
-        for brick in bricks {
-            if brick.parent != nil {
-                brick.removeFromParent()
-            }
-        }
-        
-        bricks.removeAll() // clear the array
-        removedBricks = 0  // reset the counter
-        // now, figure the number and spacing of each row of bricks
-        let count = Int(frame.width) / 55  // bricks per row
-        let xOffset = (Int(frame.width) - (count * 55)) / 2 + Int(frame.minX) + 25
-        let y = Int(frame.maxY) - 65
-        for i in 0..<count {
-            let x = i * 55 + xOffset
-            makeBrick(x: x, y: y, color: .green)
         }
     }
     
